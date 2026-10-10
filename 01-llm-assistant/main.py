@@ -10,23 +10,37 @@ load_dotenv()
 
 client = OpenAI()
 
-# add memory to remember the conversation
-messages = []
+# add memory to remember the conversation and define the role
+messages = [
+    {
+        "role": "developer",
+        "content": ("You are a patient Python tutor. "
+    "For programming exercises, your first reply must give "
+    "one short hint and ask the learner to attempt the code. "
+    "Do not provide complete solution code in that first reply. "
+    "Provide the full solution only if the learner explicitly asks for it."
+)
+    }
+]
 
 while True:
 
-    user_prompt = input("What do you want to know?: ")
+    user_prompt = input("User: ")
 
-    if user_prompt.strip() == "quit":
+    if user_prompt.strip().lower() == "quit":
         break
     
     # append messages
     messages.append({"role":"user", "content": user_prompt})
-    
+
     response = client.responses.create(
         model="gpt-4.1-mini",
-        input=user_prompt,
-        max_output_tokens=100
+        input=messages,
+        max_output_tokens=300
     )
 
-    print("Assistant:",response.output_text)
+    # append the assistants answer
+    messages.append({"role": "assistant", "content": response.output_text})
+    print("Assistant:", response.output_text)
+
+
